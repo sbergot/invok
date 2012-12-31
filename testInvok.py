@@ -80,6 +80,7 @@ class TestInvok(unittest.TestCase):
         instance = self.provider.create("MyServiceD")
         self.assertIsInstance(instance, MyServiceD)
         self.assertIsInstance(instance.myServiceC, MyServiceC)
+        self.assertIsInstance(instance.myServiceC.myService, MyService)
         self.assertIsInstance(instance.myServiceB, MyServiceB)
         self.assertIsInstance(instance.myServiceB.myServiceA, MyServiceA)
         self.assertIsInstance(instance.myServiceB.myServiceA.myService, MyService)
