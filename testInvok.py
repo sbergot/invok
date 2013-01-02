@@ -39,3 +39,11 @@ class TestAPI(unittest.TestCase):
         instance1 = invok.create("MyService")
         instance2 = invok.create("MyService")
         self.assertIsNot(instance1, instance2)
+
+    def test_option_setting(self):
+        invok.service(MyService)
+        invok.service(MyServiceE)
+        option = object()
+        invok.config("MyServiceE", option=option)
+        instance = invok.create("MyServiceE")
+        self.assertEqual(instance.option, option)

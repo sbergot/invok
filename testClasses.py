@@ -18,3 +18,8 @@ class MyServiceD:
     def __init__(self, MyServiceC, MyServiceB):
         self.MyServiceC = MyServiceC
         self.MyServiceB = MyServiceB
+
+class MyServiceE:
+    def __init__(self, MyService, option):
+        self.MyService = MyService
+        self.option = option

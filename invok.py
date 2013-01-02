@@ -1,4 +1,5 @@
 import inspect
+import functools
 
 class Provider:
 
@@ -54,6 +55,11 @@ class DependencyNode:
             # no __init__ --> no dep
             return []
 
+    def config(self, **kwargs):
+        for name in kwargs:
+            self.deps.remove(name)
+        self.cls = functools.partial(self.cls, **kwargs)
+
 class MissingDependencyError(Exception):
 
     def __init__(self, name):
@@ -76,3 +82,6 @@ def object(cls):
 
 def create(clsName):
     return provider.create(clsName)
+
+def config(clsName, **kwargs):
+    provider.nodes[clsName].config(**kwargs)
