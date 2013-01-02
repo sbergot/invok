@@ -21,25 +21,18 @@ class Provider:
     def resolve(self, deps):
         return {dep : self.create(dep) for dep in deps}
 
-    def register_service(self, **kwargs):
+    def register(self, cached, **kwargs):
         for name, cls in kwargs.items():
             self.nodes[name] = DependencyNode(
                 cls = cls,
-                cached = True
-                )
-
-    def register_object(self, **kwargs):
-        for name, cls in kwargs.items():
-            self.nodes[name] = DependencyNode(
-                cls = cls,
-                cached = False
+                cached = cached
                 )
 
     def declare_service(self, cls):
-        self.register_service(**{cls.__name__ : cls})
+        self.register(True, **{cls.__name__ : cls})
 
     def declare_object(self, cls):
-        self.register_object(**{cls.__name__ : cls})
+        self.register(False, **{cls.__name__ : cls})
 
 class DependencyNode:
 

@@ -9,7 +9,7 @@ class TestProvider(unittest.TestCase):
         self.provider = invok.Provider()
 
     def test_invok(self):
-        self.provider.register_service(MyService = MyService)
+        self.provider.register(False, MyService = MyService)
         instance = self.provider.create("MyService")
         self.assertIsInstance(instance, MyService)
 
