@@ -10,14 +10,15 @@ class Provider:
         if name not in self.nodes:
             raise MissingDependencyError(name)
         entry = self.nodes[name]
-        cls = entry.cls
-        deps = entry.deps
         if entry.cached and name in self.instances:
             return self.instances[name]
-        resolved_deps = {dep : self.create(dep) for dep in deps}
-        instance = cls(**resolved_deps)
-        self.instances[name] = instance
+        instance = entry.cls(**self.resolve(entry.deps))
+        if entry.cached:
+            self.instances[name] = instance
         return instance
+
+    def resolve(self, deps):
+        return {dep : self.create(dep) for dep in deps}
 
     def register_service(self, **kwargs):
         for name, cls in kwargs.items():
