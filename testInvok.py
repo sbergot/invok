@@ -22,11 +22,11 @@ class TestAPI(unittest.TestCase):
         invok.service(MyServiceD)
         instance = invok.create("MyServiceD")
         self.assertIsInstance(instance, MyServiceD)
-        self.assertIsInstance(instance.myServiceC, MyServiceC)
-        self.assertIsInstance(instance.myServiceC.myService, MyService)
-        self.assertIsInstance(instance.myServiceB, MyServiceB)
-        self.assertIsInstance(instance.myServiceB.myServiceA, MyServiceA)
-        self.assertIsInstance(instance.myServiceB.myServiceA.myService, MyService)
+        self.assertIsInstance(instance.MyServiceC, MyServiceC)
+        self.assertIsInstance(instance.MyServiceC.MyService, MyService)
+        self.assertIsInstance(instance.MyServiceB, MyServiceB)
+        self.assertIsInstance(instance.MyServiceB.MyServiceA, MyServiceA)
+        self.assertIsInstance(instance.MyServiceB.MyServiceA.MyService, MyService)
 
     def test_service_uniqueness(self):
         invok.service(MyService)

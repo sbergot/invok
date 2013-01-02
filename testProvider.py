@@ -18,23 +18,20 @@ class TestProvider(unittest.TestCase):
         instance = self.provider.create("MyService")
         self.assertIsInstance(instance, MyService)
 
-    def test_get_available_dependency(self):
-        self.provider.declare_service(MyServiceA)
-        self.assertEqual(self.provider.getDeps(MyServiceA), ["MyService"])
 
     def test_simple_dependency(self):
         self.provider.declare_service(MyService)
         self.provider.declare_service(MyServiceA)
         instance = self.provider.create("MyServiceA")
         self.assertIsInstance(instance, MyServiceA)
-        self.assertIsInstance(instance.myService, MyService)
+        self.assertIsInstance(instance.MyService, MyService)
 
     def test_invert_dependency(self):
         self.provider.declare_service(MyServiceA)
         self.provider.declare_service(MyService)
         instance = self.provider.create("MyServiceA")
         self.assertIsInstance(instance, MyServiceA)
-        self.assertIsInstance(instance.myService, MyService)
+        self.assertIsInstance(instance.MyService, MyService)
 
     def test_missing_dependency(self):
         self.provider.declare_service(MyServiceA)
@@ -50,8 +47,8 @@ class TestProvider(unittest.TestCase):
         self.provider.declare_service(MyServiceB)
         instance = self.provider.create("MyServiceB")
         self.assertIsInstance(instance, MyServiceB)
-        self.assertIsInstance(instance.myServiceA, MyServiceA)
-        self.assertIsInstance(instance.myServiceA.myService, MyService)
+        self.assertIsInstance(instance.MyServiceA, MyServiceA)
+        self.assertIsInstance(instance.MyServiceA.MyService, MyService)
 
     def test_multiple_nested_dependency(self):
         self.provider.declare_service(MyService)
@@ -61,11 +58,11 @@ class TestProvider(unittest.TestCase):
         self.provider.declare_service(MyServiceD)
         instance = self.provider.create("MyServiceD")
         self.assertIsInstance(instance, MyServiceD)
-        self.assertIsInstance(instance.myServiceC, MyServiceC)
-        self.assertIsInstance(instance.myServiceC.myService, MyService)
-        self.assertIsInstance(instance.myServiceB, MyServiceB)
-        self.assertIsInstance(instance.myServiceB.myServiceA, MyServiceA)
-        self.assertIsInstance(instance.myServiceB.myServiceA.myService, MyService)
+        self.assertIsInstance(instance.MyServiceC, MyServiceC)
+        self.assertIsInstance(instance.MyServiceC.MyService, MyService)
+        self.assertIsInstance(instance.MyServiceB, MyServiceB)
+        self.assertIsInstance(instance.MyServiceB.MyServiceA, MyServiceA)
+        self.assertIsInstance(instance.MyServiceB.MyServiceA.MyService, MyService)
 
     def test_service_uniqueness(self):
         self.provider.declare_service(MyService)

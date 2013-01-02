@@ -3,18 +3,18 @@ class MyService:
     pass
 
 class MyServiceA:
-    def __init__(self, myService):
-        self.myService = myService
+    def __init__(self, MyService):
+        self.MyService = MyService
 
 class MyServiceB:
-    def __init__(self, myServiceA):
-        self.myServiceA = myServiceA
+    def __init__(self, MyServiceA):
+        self.MyServiceA = MyServiceA
 
 class MyServiceC:
-    def __init__(self, myService):
-        self.myService = myService
+    def __init__(self, MyService):
+        self.MyService = MyService
 
 class MyServiceD:
-    def __init__(self, myServiceC, myServiceB):
-        self.myServiceC = myServiceC
-        self.myServiceB = myServiceB
+    def __init__(self, MyServiceC, MyServiceB):
+        self.MyServiceC = MyServiceC
+        self.MyServiceB = MyServiceB
