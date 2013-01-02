@@ -4,6 +4,7 @@ class Provider:
 
     def __init__(self):
         self.services = {}
+        self.objects = {}
         self.service_instances = {}
 
     def create_service(self, name):
@@ -17,9 +18,20 @@ class Provider:
         self.service_instances[name] = instance
         return instance
 
+    def create_object(self, name):
+        entry = self.objects[name]
+        cls = entry["cls"]
+        deps = entry["deps"]
+        resolved_deps = {self.arg_name(dep) : self.create(dep) for dep in deps}
+        instance = cls(**resolved_deps)
+        self.service_instances[name] = instance
+        return instance
+
     def create(self, name):
         if name in self.services:
             return self.create_service(name)
+        if name in self.objects:
+            return self.create_object(name)
         raise MissingDependencyError(name)
 
     def register_service(self, **kwargs):
@@ -29,8 +41,18 @@ class Provider:
                 "deps" : self.getDeps(cls)
                 }
 
+    def register_object(self, **kwargs):
+        for name, cls in kwargs.items():
+            self.objects[name] = {
+                "cls" : cls,
+                "deps" : self.getDeps(cls)
+                }
+
     def declare_service(self, cls):
         self.register_service(**{cls.__name__ : cls})
+
+    def declare_object(self, cls):
+        self.register_object(**{cls.__name__ : cls})
 
     def class_name(self, name):
         return str.upper(name[0]) + name[1:]
@@ -56,8 +78,15 @@ class MissingDependencyError(Exception):
 
 provider = Provider()
 
+def reset():
+    global provider
+    provider = Provider()
+
 def service(cls):
     provider.declare_service(cls)
+
+def object(cls):
+    provider.declare_object(cls)
 
 def create(clsName):
     return provider.create(clsName)

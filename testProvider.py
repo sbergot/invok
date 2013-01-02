@@ -66,3 +66,15 @@ class TestProvider(unittest.TestCase):
         self.assertIsInstance(instance.myServiceB, MyServiceB)
         self.assertIsInstance(instance.myServiceB.myServiceA, MyServiceA)
         self.assertIsInstance(instance.myServiceB.myServiceA.myService, MyService)
+
+    def test_service_uniqueness(self):
+        self.provider.declare_service(MyService)
+        instance1 = self.provider.create("MyService")
+        instance2 = self.provider.create("MyService")
+        self.assertIs(instance1, instance2)
+
+    def test_object_creation(self):
+        self.provider.declare_object(MyService)
+        instance1 = self.provider.create("MyService")
+        instance2 = self.provider.create("MyService")
+        self.assertIsNot(instance1, instance2)

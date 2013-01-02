@@ -5,6 +5,9 @@ from testClasses import *
 
 class TestAPI(unittest.TestCase):
 
+    def setUp(self):
+        invok.reset()
+
     def test_service(self):
         invok.service(MyService)
         instance = invok.create("MyService")
@@ -30,3 +33,9 @@ class TestAPI(unittest.TestCase):
         instance1 = invok.create("MyService")
         instance2 = invok.create("MyService")
         self.assertIs(instance1, instance2)
+
+    def test_object_creation(self):
+        invok.object(MyService)
+        instance1 = invok.create("MyService")
+        instance2 = invok.create("MyService")
+        self.assertIsNot(instance1, instance2)
