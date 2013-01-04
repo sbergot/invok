@@ -7,32 +7,41 @@ class Provider:
         self.nodes = {}
         self.instances = {}
 
-    def create(self, name):
+    def create(self, name, chain=None):
+        if chain is None:
+            chain = []
+        chain.append(name)
         if name not in self.nodes:
-            raise MissingDependencyError(name)
+            raise MissingDependencyError(name, chain)
         entry = self.nodes[name]
         if entry.cached and name in self.instances:
             return self.instances[name]
-        instance = entry.cls(**self.resolve(entry.deps))
+        instance = entry.cls(**self.resolve(entry.deps, chain))
         if entry.cached:
             self.instances[name] = instance
         return instance
 
-    def resolve(self, deps):
-        return {dep : self.create(dep) for dep in deps}
+    def resolve(self, deps, chain):
+        return {dep : self.create(dep, chain) for dep in deps}
 
     def register(self, cached, **kwargs):
         for name, cls in kwargs.items():
+            if name in self.nodes:
+                raise DuplicateDependencyError(name)
             self.nodes[name] = DependencyNode(
                 cls = cls,
                 cached = cached
                 )
 
-    def declare_service(self, cls):
-        self.register(True, **{cls.__name__ : cls})
+    def declare_service(self, cls, alias=None):
+        if alias is None:
+            alias = cls.__name__
+        self.register(True, **{alias : cls})
 
-    def declare_object(self, cls):
-        self.register(False, **{cls.__name__ : cls})
+    def declare_object(self, cls, alias=None):
+        if alias is None:
+            alias = cls.__name__
+        self.register(False, **{alias : cls})
 
 class DependencyNode:
 
@@ -55,11 +64,20 @@ class DependencyNode:
 
 class MissingDependencyError(Exception):
 
+    def __init__(self, name, chain):
+        self.name = name
+        self.chain = chain
+
+    def __str__(self):
+        return "Unable to locate service: {}. Chain: {}".format(self.name, " -> ".join(self.chain))
+
+class DuplicateDependencyError(Exception):
+
     def __init__(self, name):
         self.name = name
 
     def __str__(self):
-        return "Unable to locate service: {}".format(self.name)
+        return "Duplicate dependency: {}".format(self.name)
 
 provider = Provider()
 
@@ -68,10 +86,14 @@ def reset():
     provider = Provider()
 
 def service(cls):
-    provider.declare_service(cls)
+    def service_decorator(**kwargs):
+        return provider.declare_service(cls, **kwargs)
+    return service_decorator
 
 def object(cls):
-    provider.declare_object(cls)
+    def object_decorator(**kwargs):
+        return provider.declare_object(cls, **kwargs)
+    return object_decorator
 
 def create(clsName):
     return provider.create(clsName)

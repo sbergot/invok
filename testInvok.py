@@ -9,17 +9,21 @@ class TestAPI(unittest.TestCase):
         invok.reset()
 
     def test_service(self):
-        invok.service(MyService)
+        invok.service(MyService)()
         instance = invok.create("MyService")
         self.assertIsInstance(instance, MyService)
 
+    def test_service_alias(self):
+        invok.service(MyService)(alias = "foo")
+        instance = invok.create("foo")
+        self.assertIsInstance(instance, MyService)
 
     def test_multiple_nested_dependency(self):
-        invok.service(MyService)
-        invok.service(MyServiceA)
-        invok.service(MyServiceB)
-        invok.service(MyServiceC)
-        invok.service(MyServiceD)
+        invok.service(MyService)()
+        invok.service(MyServiceA)()
+        invok.service(MyServiceB)()
+        invok.service(MyServiceC)()
+        invok.service(MyServiceD)()
         instance = invok.create("MyServiceD")
         self.assertIsInstance(instance, MyServiceD)
         self.assertIsInstance(instance.MyServiceC, MyServiceC)
@@ -29,20 +33,20 @@ class TestAPI(unittest.TestCase):
         self.assertIsInstance(instance.MyServiceB.MyServiceA.MyService, MyService)
 
     def test_service_uniqueness(self):
-        invok.service(MyService)
+        invok.service(MyService)()
         instance1 = invok.create("MyService")
         instance2 = invok.create("MyService")
         self.assertIs(instance1, instance2)
 
     def test_object_creation(self):
-        invok.object(MyService)
+        invok.object(MyService)()
         instance1 = invok.create("MyService")
         instance2 = invok.create("MyService")
         self.assertIsNot(instance1, instance2)
 
     def test_option_setting(self):
-        invok.service(MyService)
-        invok.service(MyServiceE)
+        invok.service(MyService)()
+        invok.service(MyServiceE)()
         option = object()
         invok.config("MyServiceE", option=option)
         instance = invok.create("MyServiceE")

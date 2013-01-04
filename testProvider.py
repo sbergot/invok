@@ -18,6 +18,18 @@ class TestProvider(unittest.TestCase):
         instance = self.provider.create("MyService")
         self.assertIsInstance(instance, MyService)
 
+    def test_register_colision(self):
+        self.provider.declare_service(MyService)
+        try:
+            self.provider.declare_service(MyService)
+        except invok.DuplicateDependencyError as e:
+            return
+        self.fail("no exception thrown")
+
+    def test_register_name(self):
+        self.provider.declare_service(MyService, "alias")
+        instance = self.provider.create("alias")
+        self.assertIsInstance(instance, MyService)
 
     def test_simple_dependency(self):
         self.provider.declare_service(MyService)
@@ -38,6 +50,16 @@ class TestProvider(unittest.TestCase):
         try:
             self.provider.create("MyServiceA")
         except invok.MissingDependencyError as e:
+            return
+        self.fail("no exception thrown")
+
+    def test_missing_dependency_descr(self):
+        self.provider.declare_service(MyServiceA)
+        self.provider.declare_service(MyServiceB)
+        try:
+            self.provider.create("MyServiceB")
+        except invok.MissingDependencyError as e:
+            self.assertIn("MyServiceB -> MyServiceA -> MyService", str(e))
             return
         self.fail("no exception thrown")
 
