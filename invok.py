@@ -10,9 +10,16 @@ class Provider:
     def create(self, name, chain=None):
         if chain is None:
             chain = []
+        if name in chain:
+            chain.append(name)
+            raise ResolutionError(
+                "Cycle detected",
+                chain)
         chain.append(name)
         if name not in self.nodes:
-            raise MissingDependencyError(name, chain)
+            raise ResolutionError(
+                "Unable to locate service: {}".format(name),
+                chain)
         entry = self.nodes[name]
         if entry.cached and name in self.instances:
             return self.instances[name]
@@ -22,7 +29,7 @@ class Provider:
         return instance
 
     def resolve(self, deps, chain):
-        return {dep : self.create(dep, chain) for dep in deps}
+        return {dep : self.create(dep, list(chain)) for dep in deps}
 
     def register(self, cached, **kwargs):
         for name, cls in kwargs.items():
@@ -62,14 +69,17 @@ class DependencyNode:
             self.deps.remove(name)
         self.cls = functools.partial(self.cls, **kwargs)
 
-class MissingDependencyError(Exception):
+class ResolutionError(Exception):
 
-    def __init__(self, name, chain):
-        self.name = name
+    def __init__(self, msg, chain):
+        self.msg = msg
         self.chain = chain
 
+    def chainDescr(self):
+        return " -> ".join(self.chain)
+
     def __str__(self):
-        return "Unable to locate service: {}. Chain: {}".format(self.name, " -> ".join(self.chain))
+        return "{}. Chain: {}".format(self.msg, self.chainDescr())
 
 class DuplicateDependencyError(Exception):
 

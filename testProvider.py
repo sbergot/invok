@@ -49,7 +49,7 @@ class TestProvider(unittest.TestCase):
         self.provider.declare_service(MyServiceA)
         try:
             self.provider.create("MyServiceA")
-        except invok.MissingDependencyError as e:
+        except invok.ResolutionError as e:
             return
         self.fail("no exception thrown")
 
@@ -58,7 +58,7 @@ class TestProvider(unittest.TestCase):
         self.provider.declare_service(MyServiceB)
         try:
             self.provider.create("MyServiceB")
-        except invok.MissingDependencyError as e:
+        except invok.ResolutionError as e:
             self.assertIn("MyServiceB -> MyServiceA -> MyService", str(e))
             return
         self.fail("no exception thrown")
@@ -97,3 +97,13 @@ class TestProvider(unittest.TestCase):
         instance1 = self.provider.create("MyService")
         instance2 = self.provider.create("MyService")
         self.assertIsNot(instance1, instance2)
+
+    def test_cycle_error(self):
+        self.provider.declare_service(CycleA)
+        self.provider.declare_service(CycleB)
+        self.provider.declare_service(CycleC)
+        try:
+            self.provider.create("CycleA")
+        except invok.ResolutionError:
+            return
+        self.fail("no error raised")

@@ -23,3 +23,14 @@ class MyServiceE:
     def __init__(self, MyService, option):
         self.MyService = MyService
         self.option = option
+
+
+class CycleA:
+    def __init__(self, CycleC):
+        pass
+class CycleB:
+    def __init__(self, CycleA):
+        pass
+class CycleC:
+    def __init__(self, CycleB):
+        pass
