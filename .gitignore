@@ -8,3 +8,5 @@
 *.Cache
 *.pdb
 *.resources
+MANIFEST
+dist
