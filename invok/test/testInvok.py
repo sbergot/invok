@@ -1,5 +1,5 @@
 import unittest
-from invok import invok
+import invok
 
 from testClasses import *
 

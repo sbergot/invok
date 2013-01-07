@@ -1,12 +1,12 @@
 import unittest
-from invok import invok
+from invok.Provider import *
 
 from testClasses import *
 
 class TestProvider(unittest.TestCase):
 
     def setUp(self):
-        self.provider = invok.Provider()
+        self.provider = Provider()
 
     def test_invok(self):
         self.provider.register(False, MyService = MyService)
@@ -22,7 +22,7 @@ class TestProvider(unittest.TestCase):
         self.provider.declare_service(MyService)
         try:
             self.provider.declare_service(MyService)
-        except invok.DuplicateDependencyError as e:
+        except DuplicateDependencyError as e:
             return
         self.fail("no exception thrown")
 
@@ -49,7 +49,7 @@ class TestProvider(unittest.TestCase):
         self.provider.declare_service(MyServiceA)
         try:
             self.provider.create("MyServiceA")
-        except invok.ResolutionError as e:
+        except ResolutionError as e:
             return
         self.fail("no exception thrown")
 
@@ -58,7 +58,7 @@ class TestProvider(unittest.TestCase):
         self.provider.declare_service(MyServiceB)
         try:
             self.provider.create("MyServiceB")
-        except invok.ResolutionError as e:
+        except ResolutionError as e:
             self.assertIn("MyServiceB -> MyServiceA -> MyService", str(e))
             return
         self.fail("no exception thrown")
@@ -104,6 +104,6 @@ class TestProvider(unittest.TestCase):
         self.provider.declare_service(CycleC)
         try:
             self.provider.create("CycleA")
-        except invok.ResolutionError:
+        except ResolutionError:
             return
         self.fail("no error raised")

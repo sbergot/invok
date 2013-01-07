@@ -1,5 +1,4 @@
-import inspect
-import functools
+import DependencyNode
 
 class Provider:
 
@@ -35,7 +34,7 @@ class Provider:
         for name, cls in kwargs.items():
             if name in self.nodes:
                 raise DuplicateDependencyError(name)
-            self.nodes[name] = DependencyNode(
+            self.nodes[name] = DependencyNode.DependencyNode(
                 cls = cls,
                 cached = cached
                 )
@@ -50,24 +49,6 @@ class Provider:
             alias = cls.__name__
         self.register(False, **{alias : cls})
 
-class DependencyNode:
-
-    def __init__(self, cls, cached):
-        self.cls = cls
-        self.deps = self.get_deps(cls)
-        self.cached = cached
-
-    def get_deps(self, cls):
-        try:
-            return inspect.getargspec(cls.__init__).args[1:]
-        except AttributeError:
-            # no __init__ --> no dep
-            return []
-
-    def config(self, **kwargs):
-        for name in kwargs:
-            self.deps.remove(name)
-        self.cls = functools.partial(self.cls, **kwargs)
 
 class ResolutionError(Exception):
 
@@ -88,25 +69,3 @@ class DuplicateDependencyError(Exception):
 
     def __str__(self):
         return "Duplicate dependency: {}".format(self.name)
-
-provider = Provider()
-
-def reset():
-    global provider
-    provider = Provider()
-
-def service(cls):
-    def service_decorator(**kwargs):
-        return provider.declare_service(cls, **kwargs)
-    return service_decorator
-
-def object(cls):
-    def object_decorator(**kwargs):
-        return provider.declare_object(cls, **kwargs)
-    return object_decorator
-
-def create(clsName):
-    return provider.create(clsName)
-
-def config(clsName, **kwargs):
-    provider.nodes[clsName].config(**kwargs)
